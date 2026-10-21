@@ -1,0 +1,19 @@
+# Tracera Run in CI — GitLab.com smoke (dispatch vars only).
+# Pipeline trigger token + variables from Tracera: TRACERA_TEST_RUN_ID / BASE_URL / PROJECT_ID
+stages:
+  - smoke
+
+tracera_dispatch_smoke:
+  stage: smoke
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "trigger"
+    - if: $CI_PIPELINE_SOURCE == "web"
+    - if: $CI_PIPELINE_SOURCE == "api"
+  script:
+    - echo "TRACERA_TEST_RUN_ID=${TRACERA_TEST_RUN_ID}"
+    - echo "TRACERA_BASE_URL=${TRACERA_BASE_URL}"
+    - echo "TRACERA_PROJECT_ID=${TRACERA_PROJECT_ID}"
+    - |
+      if [ -z "${TRACERA_TEST_RUN_ID}" ]; then
+        echo "No TRACERA_TEST_RUN_ID (manual/web run without Tracera) — ok for CI file check"
+      fi

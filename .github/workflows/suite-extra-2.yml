@@ -1,0 +1,39 @@
+# Extra Target for header overflow (+N). Same smoke suite as suite-smoke.yml.
+name: Suite extra 2
+
+on:
+  workflow_dispatch:
+    inputs:
+      TRACERA_TEST_RUN_ID:
+        description: Tracera test run id (attach mode)
+        required: false
+        type: string
+      TRACERA_BASE_URL:
+        description: Tracera public base URL
+        required: false
+        type: string
+      TRACERA_PROJECT_ID:
+        description: Tracera project id
+        required: false
+        type: string
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - name: Vitest + Tracera report
+        env:
+          TRACERA_BASE_URL: ${{ inputs.TRACERA_BASE_URL }}
+          TRACERA_PROJECT_ID: ${{ inputs.TRACERA_PROJECT_ID }}
+          TRACERA_TEST_RUN_ID: ${{ inputs.TRACERA_TEST_RUN_ID }}
+          TRACERA_AUTOTEST_TOKEN: ${{ secrets.TRACERA_AUTOTEST_TOKEN }}
+          TRACERA_LOG_LEVEL: debug
+          TRACERA_REQUIRE_REPORT: "true"
+        run: npm run test:smoke
